@@ -135,26 +135,16 @@ jobs:
           ndk-version: ${{ env.NDK_VERSION }}
           link-to-sdk: true
 
-      - name: Decode keystore
-        if: ${{ env.KEYSTORE != '' }}
-        run: echo $KEYSTORE | base64 -di > app/androidkey.jks
-
       - name: Generate dummy keystore
-        if: ${{ env.KEYSTORE == '' }}
         run: |
-            keytool -genkeypair -v -keystore app/androidkey.jks -alias dummy_alias \
-              -storepass dummy_pass -keypass dummy_pass -keyalg RSA -keysize 2048 -validity 10000 \
-              -dname "CN=example, OU=example, O=example, L=example, S=example, C=example"
-            echo 'SIGNING_KEY_ALIAS=dummy_alias' >> $GITHUB_ENV
-            echo 'SIGNING_STORE_PASSWORD=dummy_pass' >> $GITHUB_ENV
-            echo 'SIGNING_KEY_PASSWORD=dummy_pass' >> $GITHUB_ENV
+          keytool -genkeypair -v -keystore app/androidkey.jks -alias dummy_alias \
+            -storepass dummy_pass -keypass dummy_pass -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=example, OU=example, O=example, L=example, S=example, C=example"
+          echo "SIGNING_KEY_ALIAS=dummy_alias" >> "$GITHUB_ENV"
+          echo "SIGNING_STORE_PASSWORD=dummy_pass" >> "$GITHUB_ENV"
+          echo "SIGNING_KEY_PASSWORD=dummy_pass" >> "$GITHUB_ENV"
 
-             - name: Build release APK
-              - name: Build release APK
-        env:
-          SIGNING_KEY_ALIAS: ${{ env.SIGNING_KEY_ALIAS }}
-          SIGNING_KEY_PASSWORD: ${{ env.SIGNING_KEY_PASSWORD }}
-          SIGNING_STORE_PASSWORD: ${{ env.SIGNING_STORE_PASSWORD }}
+      - name: Build release APK
         run: |
           bash ./gradlew assembleRelease \
             -PMYAPP_RELEASE_STORE_FILE=androidkey.jks \
@@ -166,7 +156,7 @@ jobs:
         with:
           name: ruffle-release-apks
           path: app/build/outputs/apk/release/*.apk
-
+        
   android-tests:
     name: Android Tests
     needs: build-native-libs
