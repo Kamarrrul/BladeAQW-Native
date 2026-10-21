@@ -150,17 +150,19 @@ jobs:
             echo 'SIGNING_KEY_PASSWORD=dummy_pass' >> $GITHUB_ENV
 
              - name: Build release APK
+              - name: Build release APK
         env:
-          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS || env.SIGNING_KEY_ALIAS }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD || env.SIGNING_KEY_PASSWORD }}
-          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD || env.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ env.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ env.SIGNING_KEY_PASSWORD }}
+          SIGNING_STORE_PASSWORD: ${{ env.SIGNING_STORE_PASSWORD }}
         run: |
           bash ./gradlew assembleRelease \
             -PMYAPP_RELEASE_STORE_FILE=androidkey.jks \
             -PMYAPP_RELEASE_STORE_PASSWORD="$SIGNING_STORE_PASSWORD" \
             -PMYAPP_RELEASE_KEY_ALIAS="$SIGNING_KEY_ALIAS" \
-            -PMYAPP_RELEASE_KEY_PASSWORD="$SIGNING_KEY_PASSWORD"     
-            - uses: actions/upload-artifact@v6
+            -PMYAPP_RELEASE_KEY_PASSWORD="$SIGNING_KEY_PASSWORD"
+
+      - uses: actions/upload-artifact@v6
         with:
           name: ruffle-release-apks
           path: app/build/outputs/apk/release/*.apk
