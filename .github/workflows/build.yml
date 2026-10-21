@@ -149,7 +149,7 @@ jobs:
             echo 'SIGNING_STORE_PASSWORD=dummy_pass' >> $GITHUB_ENV
             echo 'SIGNING_KEY_PASSWORD=dummy_pass' >> $GITHUB_ENV
 
-        run: |
+       - run: |
           bash ./gradlew assembleRelease \
             -PMYAPP_RELEASE_STORE_FILE=androidkey.jks \
             -PMYAPP_RELEASE_STORE_PASSWORD="$SIGNING_STORE_PASSWORD" \
