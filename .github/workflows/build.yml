@@ -145,8 +145,7 @@ jobs:
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS || env.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD || env.SIGNING_KEY_PASSWORD }}
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD || env.SIGNING_STORE_PASSWORD }}
-        run: ./gradlew assembleRelease
-
+        run: bash ./gradlew assembleRelease
       - uses: actions/upload-artifact@v6
         with:
           name: ruffle-release-apks
@@ -207,7 +206,7 @@ jobs:
           arch: x86_64
           script: |
             adb shell settings put secure immersive_mode_confirmations confirmed
-            ./gradlew connectedCheck
+            bash ./gradlew connectedCheck
 
       - name: Upload Test Report
         uses: actions/upload-artifact@v6
