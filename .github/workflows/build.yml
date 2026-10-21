@@ -66,14 +66,23 @@ jobs:
 
           cargo fetch --locked
 
-          NAVIGATOR_FILE="$(grep -rl 'TcpStream::connect((host, port)).or(timeout).await' "$HOME/.cargo/git/checkouts"/ruffle-*/*/frontend-utils/src/backends/navigator.rs | head -n 1)"
+                    NAVIGATOR_FILE="$(grep -rl 'TcpStream::connect' "$HOME/.cargo/git/checkouts"/ruffle-*/*/frontend-utils/src/backends/navigator.rs 2>/dev/null | head -n 1)"
 
           if [ -z "$NAVIGATOR_FILE" ]; then
             echo "AQW navigator.rs not found"
             exit 1
           fi
 
-          sed -i 's/TcpStream::connect((host, port))/TcpStream::connect(("127.0.0.1", 8181))/' "$NAVIGATOR_FILE"
+          if grep -q 'TcpStream::connect((host, port))' "$NAVIGATOR_FILE"; then
+            echo "Applying AQW socket patch..."
+            sed -i 's/TcpStream::connect((host, port))/TcpStream::connect(("127.0.0.1", 8181))/' "$NAVIGATOR_FILE"
+          elif grep -q 'TcpStream::connect(("127.0.0.1", 8181))' "$NAVIGATOR_FILE"; then
+            echo "AQW socket patch already applied"
+          else
+            echo "Unknown navigator.rs socket format"
+            grep -n 'TcpStream::connect' "$NAVIGATOR_FILE" || true
+            exit 1
+          fi
 
           echo "AQW SOCKET PATCH:"
           grep -n 'TcpStream::connect' "$NAVIGATOR_FILE"
